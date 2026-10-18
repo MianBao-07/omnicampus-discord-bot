@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables & secrets
+.env
+
+# Dynamic runtime data & state
+data/*.json
+!data/.gitkeep
+
+# Operating system / logs
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*

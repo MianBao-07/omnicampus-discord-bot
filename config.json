@@ -1,0 +1,20 @@
+{
+  "omnicampus": {
+    "baseUrl": "https://edu.omnicamp.us",
+    "courseId": "170",
+    "assignmentId": "1038",
+    "cdpHost": "127.0.0.1",
+    "cdpPort": 9222
+  },
+  "polling": {
+    "intervalSeconds": 300,
+    "jitterSeconds": 30
+  },
+  "discord": {
+    "alertsChannelId": "YOUR_ALERTS_CHANNEL_ID",
+    "dashboardChannelId": "YOUR_OPTIONAL_DASHBOARD_CHANNEL_ID",
+    "top10Ping": "@everyone",
+    "enableDailyRecap": true,
+    "recapHour": 0
+  }
+}

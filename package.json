@@ -1,0 +1,17 @@
+{
+  "name": "omnicampus-discord-bot",
+  "version": "1.0.0",
+  "description": "Discord bot tracking Omnicampus live leaderboard, watchlist alerts, and top 10 updates via Chrome DevTools Protocol",
+  "main": "src/index.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.mjs",
+    "deploy-commands": "node src/deployCommands.mjs"
+  },
+  "dependencies": {
+    "discord.js": "^14.18.0"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
