@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
+import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 import {
   getWatchlist,
   addToWatchlist,
@@ -78,6 +78,14 @@ export const slashCommands = [
 export async function handleInteraction(interaction, context) {
   if (!interaction.isChatInputCommand()) return;
 
+  // Acknowledge interaction immediately within Discord's 3-second window
+  try {
+    await interaction.deferReply();
+  } catch (err) {
+    console.warn('[Interaction] Could not defer interaction (already handled or expired):', err.message);
+    return;
+  }
+
   const { commandName } = interaction;
   const state = getState();
   const rows = state.lastLeaderboard || [];
@@ -101,7 +109,7 @@ export async function handleInteraction(interaction, context) {
       )
       .setFooter({ text: 'Simple & Autonomous 24/7 Monitoring' });
 
-    return await interaction.reply({ embeds: [embed] });
+    return await interaction.editReply({ embeds: [embed] });
   }
 
   if (commandName === 'input') {
@@ -116,7 +124,7 @@ export async function handleInteraction(interaction, context) {
       extra = `\nℹ️ *Note: This user is not yet on the active leaderboard or has not submitted yet.*`;
     }
 
-    return await interaction.reply({
+    return await interaction.editReply({
       content: `✅ Successfully added **${username}** to the watchlist! Alerts will notify <@${interaction.user.id}>.${extra}`
     });
   }
@@ -126,9 +134,9 @@ export async function handleInteraction(interaction, context) {
     const removed = removeFromWatchlist(username);
 
     if (removed) {
-      return await interaction.reply({ content: `🗑️ Removed **${username}** from the watchlist.` });
+      return await interaction.editReply({ content: `🗑️ Removed **${username}** from the watchlist.` });
     } else {
-      return await interaction.reply({ content: `⚠️ **${username}** was not found in the watchlist.`, ephemeral: true });
+      return await interaction.editReply({ content: `⚠️ **${username}** was not found in the watchlist.` });
     }
   }
 
@@ -141,7 +149,7 @@ export async function handleInteraction(interaction, context) {
     if (!user2) {
       // Single user lookup
       if (!data1) {
-        return await interaction.reply({
+        return await interaction.editReply({
           content: `❌ User **${user1}** was not found on the leaderboard (${total} total participants recorded).`
         });
       }
@@ -158,19 +166,19 @@ export async function handleInteraction(interaction, context) {
         .setFooter({ text: `Total Competitors: ${total}` })
         .setTimestamp();
 
-      return await interaction.reply({ embeds: [embed] });
+      return await interaction.editReply({ embeds: [embed] });
     } else {
       // Comparison between user1 and user2
       const data2 = rowsMap.get(user2.toLowerCase());
 
       if (!data1 && !data2) {
-        return await interaction.reply({ content: `❌ Neither **${user1}** nor **${user2}** were found on the leaderboard.` });
+        return await interaction.editReply({ content: `❌ Neither **${user1}** nor **${user2}** were found on the leaderboard.` });
       }
       if (!data1) {
-        return await interaction.reply({ content: `❌ User **${user1}** was not found on the leaderboard.` });
+        return await interaction.editReply({ content: `❌ User **${user1}** was not found on the leaderboard.` });
       }
       if (!data2) {
-        return await interaction.reply({ content: `❌ User **${user2}** was not found on the leaderboard.` });
+        return await interaction.editReply({ content: `❌ User **${user2}** was not found on the leaderboard.` });
       }
 
       const rankDiff = Math.abs(data1.rank - data2.rank);
@@ -199,7 +207,7 @@ export async function handleInteraction(interaction, context) {
         .setFooter({ text: `Total Competitors: ${total}` })
         .setTimestamp();
 
-      return await interaction.reply({ embeds: [embed] });
+      return await interaction.editReply({ embeds: [embed] });
     }
   }
 
@@ -208,7 +216,7 @@ export async function handleInteraction(interaction, context) {
     const target = rowsMap.get(username.toLowerCase());
 
     if (!target) {
-      return await interaction.reply({ content: `❌ User **${username}** was not found on the leaderboard.` });
+      return await interaction.editReply({ content: `❌ User **${username}** was not found on the leaderboard.` });
     }
 
     const currentIdx = rows.findIndex(r => r.name.toLowerCase() === username.toLowerCase());
@@ -240,7 +248,7 @@ export async function handleInteraction(interaction, context) {
       .setFooter({ text: `Total Competitors: ${total}` })
       .setTimestamp();
 
-    return await interaction.reply({ embeds: [embed] });
+    return await interaction.editReply({ embeds: [embed] });
   }
 
   if (commandName === 'history') {
@@ -248,7 +256,7 @@ export async function handleInteraction(interaction, context) {
     const history = getHistory(username);
 
     if (!history || history.length === 0) {
-      return await interaction.reply({
+      return await interaction.editReply({
         content: `ℹ️ No historical progression recorded for **${username}** yet. Progression is recorded automatically as score changes occur.`
       });
     }
@@ -264,14 +272,14 @@ export async function handleInteraction(interaction, context) {
       .setDescription(lines.join('\n'))
       .setFooter({ text: `Showing last ${Math.min(15, history.length)} recorded milestones` });
 
-    return await interaction.reply({ embeds: [embed] });
+    return await interaction.editReply({ embeds: [embed] });
   }
 
   if (commandName === 'watchlist') {
     const watchlist = getWatchlist();
 
     if (watchlist.length === 0) {
-      return await interaction.reply({
+      return await interaction.editReply({
         content: 'ℹ️ The watchlist is currently empty. Use `/input <username>` to add someone!'
       });
     }
@@ -293,7 +301,7 @@ export async function handleInteraction(interaction, context) {
       .setFooter({ text: `Total Participants: ${total}` })
       .setTimestamp();
 
-    return await interaction.reply({ embeds: [embed] });
+    return await interaction.editReply({ embeds: [embed] });
   }
 
   if (commandName === 'status') {
@@ -323,6 +331,6 @@ export async function handleInteraction(interaction, context) {
       .setFooter({ text: `Polling every ~${Math.round(context.config.polling.intervalSeconds / 60)} minutes with jitter` })
       .setTimestamp();
 
-    return await interaction.reply({ embeds: [embed] });
+    return await interaction.editReply({ embeds: [embed] });
   }
 }

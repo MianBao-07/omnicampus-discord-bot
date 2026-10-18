@@ -46,15 +46,28 @@ const context = {
   consecutiveErrors: 0
 };
 
+// Global error guards to keep the bot alive 24/7
+client.on('error', (err) => {
+  console.error('[Discord Client Error]:', err.message);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('[Unhandled Rejection]:', reason);
+});
+
 client.on('interactionCreate', async (interaction) => {
   try {
     await handleInteraction(interaction, context);
   } catch (err) {
-    console.error('[Interaction] Error handling interaction:', err);
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp({ content: 'An error occurred while executing this command.', ephemeral: true });
-    } else {
-      await interaction.reply({ content: 'An error occurred while executing this command.', ephemeral: true });
+    console.error('[Interaction] Error handling interaction:', err.message);
+    try {
+      if (interaction.deferred || interaction.replied) {
+        await interaction.editReply({ content: 'An error occurred while executing this command.' });
+      } else {
+        await interaction.reply({ content: 'An error occurred while executing this command.' });
+      }
+    } catch {
+      // Ignore if the interaction token has already expired on Discord's side
     }
   }
 });
