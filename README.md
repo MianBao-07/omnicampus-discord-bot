@@ -94,22 +94,30 @@ npm run deploy-commands
 
 ---
 
-### 4. Running Chrome with Remote Debugging
+### 4. Running Brave or Chrome with Remote Debugging
 
-Close existing Chrome windows, then start Chrome with remote debugging on port 9222:
+Make sure existing instances of your browser are closed, then launch with `--remote-debugging-port=9222`:
 
-**Windows PowerShell:**
+#### Brave (Recommended)
+**Windows (PowerShell / Command Prompt):**
+```powershell
+& "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" --remote-debugging-port=9222 --remote-allow-origins=*
+```
+*(Or if `brave.exe` is in your PATH, just `brave.exe --remote-debugging-port=9222 --remote-allow-origins=*`)*
+
+#### Google Chrome
+**Windows:**
 ```powershell
 chrome.exe --remote-debugging-port=9222 --remote-allow-origins=*
 ```
 
-Log into your Omnicampus account in that Chrome window so your session cookies are active.
+*Log into your Omnicampus account in that browser window so your session cookies are active.*
 
 ---
 
 ### 5. Launch the Bot
 
-Double-click `start.bat` or run in terminal:
+Simply double-click `start.bat` (which **auto-detects Brave** first, launches it if not already open, and boots the bot) or run:
 ```bash
 npm start
 ```

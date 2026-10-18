@@ -26,12 +26,42 @@ if not exist "node_modules\" (
 :: 3. Check if CDP port 9222 is listening
 netstat -ano | findstr 9222 >nul
 if %errorlevel% neq 0 (
-    echo [!] Chrome remote debugging port 9222 is NOT active.
-    echo [*] Launching Google Chrome with remote debugging enabled...
-    start "" chrome.exe --remote-debugging-port=9222 --remote-allow-origins=*
+    echo [!] Remote debugging port 9222 is NOT active.
+    echo [*] Searching for Brave or Chrome...
+
+    set "BROWSER_CMD="
+    if exist "C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe" (
+        set "BROWSER_CMD=C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
+        echo [*] Found Brave Browser.
+    ) else if exist "%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe" (
+        set "BROWSER_CMD=%LOCALAPPDATA%\BraveSoftware\Brave-Browser\Application\brave.exe"
+        echo [*] Found Brave Browser.
+    ) else (
+        where brave.exe >nul 2>&1
+        if %errorlevel% equ 0 (
+            set "BROWSER_CMD=brave.exe"
+            echo [*] Found Brave Browser in PATH.
+        )
+    )
+
+    if not defined BROWSER_CMD (
+        if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" (
+            set "BROWSER_CMD=C:\Program Files\Google\Chrome\Application\chrome.exe"
+            echo [*] Found Google Chrome.
+        ) else if exist "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" (
+            set "BROWSER_CMD=C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+            echo [*] Found Google Chrome.
+        ) else (
+            set "BROWSER_CMD=chrome.exe"
+            echo [*] Defaulting to Chrome.
+        )
+    )
+
+    echo [*] Launching browser with remote debugging on port 9222...
+    start "" "%BROWSER_CMD%" --remote-debugging-port=9222 --remote-allow-origins=*
     timeout /t 3 /nobreak >nul
 ) else (
-    echo [OK] Chrome remote debugging session detected on port 9222.
+    echo [OK] Remote debugging session already detected on port 9222.
 )
 
 :: 4. Start the bot
