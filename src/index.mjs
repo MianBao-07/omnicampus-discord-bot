@@ -73,39 +73,6 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 /**
- * Updates or creates the persistent live dashboard in the specified channel.
- */
-async function updateDashboard(currRows, timestamp) {
-  const channelId = config.discord?.dashboardChannelId;
-  if (!channelId || channelId === 'YOUR_OPTIONAL_DASHBOARD_CHANNEL_ID') return;
-
-  try {
-    const channel = await client.channels.fetch(channelId);
-    if (!channel || !channel.isTextBased()) return;
-
-    const state = getState();
-    const embedData = buildDashboardEmbed(currRows, getWatchlist(), timestamp);
-
-    if (state.dashboardMessageId) {
-      try {
-        const msg = await channel.messages.fetch(state.dashboardMessageId);
-        if (msg) {
-          await msg.edit({ embeds: [embedData] });
-          return;
-        }
-      } catch {
-        // Message was deleted or unreachable, send fresh one below
-      }
-    }
-
-    const newMsg = await channel.send({ embeds: [embedData] });
-    saveState({ dashboardMessageId: newMsg.id });
-  } catch (err) {
-    console.warn('[Dashboard] Could not update dashboard embed:', err.message);
-  }
-}
-
-/**
  * Checks and triggers the daily midnight recap if due.
  */
 async function checkDailyRecap(currRows, alertsChannel) {
@@ -164,9 +131,6 @@ async function runScrapeCycle() {
       }
     }
 
-    // Update persistent dashboard
-    await updateDashboard(currRows, scraped.timestamp);
-
     // Check daily midnight recap
     await checkDailyRecap(currRows, alertsChannel);
 
@@ -206,7 +170,6 @@ client.once('ready', () => {
   console.log(` Omnicampus Discord Bot is Online!`);
   console.log(` Logged in as: ${client.user.tag}`);
   console.log(` Alerts Channel: ${config.discord.alertsChannelId}`);
-  console.log(` Dashboard Channel: ${config.discord.dashboardChannelId || '(Disabled)'}`);
   console.log(` Polling Interval: ~${Math.round((config.polling?.intervalSeconds || 300) / 60)} minutes`);
   console.log(`========================================\n`);
 

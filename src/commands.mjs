@@ -7,11 +7,16 @@ import {
   getState
 } from './storage.mjs';
 import { checkCdpHealth } from './cdp.mjs';
+import { buildDashboardEmbed } from './alertEngine.mjs';
 
 export const slashCommands = [
   new SlashCommandBuilder()
     .setName('cmds')
     .setDescription('Display the list of available commands and instructions'),
+
+  new SlashCommandBuilder()
+    .setName('dashboard')
+    .setDescription('Display the full leaderboard dashboard (Top 10, Watchlist, & Total Competitors)'),
 
   new SlashCommandBuilder()
     .setName('input')
@@ -98,6 +103,7 @@ export async function handleInteraction(interaction, context) {
       .setColor(0x5865F2)
       .setDescription('Automated 24/7 tracker and alerts engine via Chrome DevTools Protocol.')
       .addFields(
+        { name: '`/dashboard`', value: 'Displays the full leaderboard dashboard (Top 10, Watchlist, & Total Competitors).' },
         { name: '`/input [Username]`', value: 'Adds a username to the watchlist. Stores your Discord ID for pings on rank changes.' },
         { name: '`/remove [Username]`', value: 'Removes a username from the watchlist.' },
         { name: '`/track [Username] [Username2]`', value: 'Shows score & rank for a user, or compares score/rank differences between two users.' },
@@ -110,6 +116,11 @@ export async function handleInteraction(interaction, context) {
       .setFooter({ text: 'Simple & Autonomous 24/7 Monitoring' });
 
     return await interaction.editReply({ embeds: [embed] });
+  }
+
+  if (commandName === 'dashboard') {
+    const embedData = buildDashboardEmbed(rows, getWatchlist(), state.lastScrapeTime);
+    return await interaction.editReply({ embeds: [embedData] });
   }
 
   if (commandName === 'input') {

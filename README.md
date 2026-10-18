@@ -12,9 +12,9 @@ Autonomous 24/7 Discord bot that scrapes and tracks live competition leaderboard
   * 📈 **Rank & Score Increases**: Broadcasts score bumps and rank advancements with historical deltas.
   * 📢 **Top 10 Updates**: Live top 10 snapshot with indicators (`⭐` new entrant, `🔺` climbed, `🔻` dropped) with `@everyone` announcement.
   * 📊 **Daily Midnight Recap**: Automated summary at 00:00 showing participant growth, top score, cutoff, and **Climber of the Day**.
-* **Live Dashboard Channel**: Optional sticky, auto-updating leaderboard and watchlist status board that updates in-place without chat spam.
 * **Interactive Slash Commands**:
   * `/cmds` — Shows command guide and instructions.
+  * `/dashboard` — Displays the full leaderboard dashboard (Top 10, Watchlist, & Total Competitors).
   * `/input [Username]` — Adds a user to the watchlist and registers your Discord ID for pings.
   * `/remove [Username]` — Removes a user from the watchlist.
   * `/track [Username] [Username2]` — Checks a user's stats or compares score/rank head-to-head.
@@ -39,9 +39,8 @@ Autonomous 24/7 Discord bot that scrapes and tracks live competition leaderboard
    * Scopes: `bot`, `applications.commands`
    * Bot Permissions: `Send Messages`, `Embed Links`, `Mention Everyone`, `Use External Emojis`, `Read Message History`.
    * Open the generated URL in your browser to invite the bot to your Discord server.
-4. In Discord, turn on **Developer Mode** (User Settings ➔ Advanced ➔ Developer Mode), right-click your target channels and copy their IDs:
+4. In Discord, turn on **Developer Mode** (User Settings ➔ Advanced ➔ Developer Mode), right-click your target channel and copy its ID:
    * **Alerts Channel ID**: Where rank change pings and top 10 announcements are posted.
-   * **Dashboard Channel ID** (optional): A dedicated channel where the bot keeps a single auto-updating scoreboard.
 
 ---
 
